@@ -1,0 +1,41 @@
+#cloud-config
+package_update: true
+packages:
+  - nginx
+
+write_files:
+  - path: /var/www/html/index.html
+    content: |
+      <!DOCTYPE html>
+      <html lang="ru">
+      <head>
+          <meta charset="UTF-8">
+          <title>Vagrant VM with cloud-init</title>
+          <style>
+              body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
+              h1 { color: #333; }
+              .container { background: white; border-radius: 10px; padding: 20px; display: inline-block; }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <h1>Успешно!</h1>
+              <p>Веб-сервер настроен через cloud-init.</p>
+              <p>Vagrant + cloud-init + Nginx</p>
+          </div>
+      </body>
+      </html>
+    permissions: '0644'
+    owner: www-data:www-data
+
+users:
+  - name: clouduser
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: false
+    passwd: $6$rounds=4096$salt$hashed_password_here
+
+runcmd:
+  - systemctl enable nginx
+  - systemctl restart nginx
+  - echo "cloud-init provisioning completed" > /var/log/cloud-init-vagrant.log
